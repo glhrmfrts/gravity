@@ -4,13 +4,12 @@
 
 var solarSystem = document.getElementById('solar_system'),
 	ctx = solarSystem.getContext('2d'),
-	fps = 50,
+	fps = 60,
 	planets = [],
 	totalPlanets = 0,
 	player = {},
 	homePlanet = {},
 	goalPlanet = {},
-	x = 0,
 	radius = 0,
 	mouseX = 0,
 	mouseY = 0,
@@ -27,11 +26,13 @@ var solarSystem = document.getElementById('solar_system'),
 	map = {},
 	audios = [],
 	AUDIO_LOSE = 0,
-	AUDIO_WIN = 1;
+	AUDIO_WIN = 1,
+	random = false;
 
 //create a new game with random positions, when we're out of maps
 function newGame() {
 
+	random = true;
 	planets = [];
 	totalPlanets = 4 + Math.floor(Math.random() * 4);
 	maxPower = totalPlanets * 10;
@@ -54,7 +55,7 @@ function newGame() {
 		density: getDensity(goalRadius)
 	};
 
-	createPlayer(true);
+	createPlayer(random);
 
 	var i = 0;
 	var r = Math.floor(Math.random() * totalPlanets.length);
@@ -238,7 +239,7 @@ function update(dt) {
 			audios[AUDIO_WIN].play();
 			level++;
 
-			if (level >= maps.length - 1)
+			if (level == maps.length)
 				newGame();
 			else
 				loadLevel(level);
@@ -366,20 +367,27 @@ function restart() {
 	flying = false;
 	launchPower = 0;
 	currentPowerRectHeight = 0;
+
+	if (powerDirection < 0) powerDirection = -powerDirection;
 	maxPower = map.maxPower;
 }
 
 function run() {
 
 	var time = new Date().getTime(),
-		previousTime;
+		previousTime,
+		dt;
 
 	window.setInterval(function() {
 
 		previousTime = time;
 		time = new Date().getTime();
+		dt = time - previousTime / 100;
 
-		update(0.1);
+		if (dt > 0.1)
+			dt = 0.1;
+
+		update(dt);
 		draw();
 	}, 1000 / fps);
 }

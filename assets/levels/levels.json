@@ -183,7 +183,7 @@
 		"radius": 50,
 		"density": 3
 	},
-	"maxPower": 50,
+	"maxPower": 40,
 	"playerRadius": 10,
 	"playerDensity": 1,
 	"planets": [
@@ -293,7 +293,7 @@
 		"radius": 60,
 		"density": 4
 	},
-	"maxPower": 40,
+	"maxPower": 35,
 	"playerRadius": 10,
 	"playerDensity": 1,
 	"planets": [
