@@ -371,7 +371,7 @@ var level = 0,
 	getLevels = $.getJSON("assets/levels/levels.json");
 getLevels.done(function(data) {
 	loadMaps(data);
-	loadLevel(7);
+	loadLevel(level);
 });
 
 solarSystem.addEventListener('mousemove', mouseMove);
