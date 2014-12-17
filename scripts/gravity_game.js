@@ -6,7 +6,7 @@ var solarSystem = document.getElementById('solar_system'),
 	ctx = solarSystem.getContext('2d'),
 	fps = 50,
 	planets = [],
-	totalPlanets = 4,
+	totalPlanets = 0,
 	player = {},
 	homePlanet = {},
 	goalPlanet = {},
@@ -24,12 +24,17 @@ var solarSystem = document.getElementById('solar_system'),
 	playerAngle = 0,
 	angleText = 0,
 	maps = [],
-	map = {};
+	map = {},
+	audios = [],
+	AUDIO_LOSE = 0,
+	AUDIO_WIN = 1;
 
 //create a new game with random positions, when we're out of maps
 function newGame() {
 
-	x = 0;
+	planets = [];
+	totalPlanets = 4 + Math.floor(Math.random() * 4);
+	maxPower = totalPlanets * 10;
 
 	var homeRadius = 40 + Math.floor(Math.random() * 20),
 		homeY = (homeRadius + 20) + Math.floor(Math.random() * (solarSystem.height - homeRadius - 20));
@@ -49,7 +54,7 @@ function newGame() {
 		density: getDensity(goalRadius)
 	};
 
-	createPlayer();
+	createPlayer(true);
 
 	var i = 0;
 	var r = Math.floor(Math.random() * totalPlanets.length);
@@ -89,6 +94,7 @@ function newGame() {
 			y: y,
 			radius: radius,
 			density: density,
+			satellites: []
 		});
 		i++;
 	}
@@ -113,16 +119,18 @@ function loadLevel(i) {
 	createPlayer();
 }
 
-function createPlayer() {
+function createPlayer(random) {
 
 	var playerX = homePlanet.x + homePlanet.radius,
-		playerY = homePlanet.y;
+		playerY = homePlanet.y,
+		playerRadius = (random) ? 5 + Math.floor(Math.random() * 5) : map.playerRadius,
+		playerDensity = (random) ? 10 - playerRadius : map.playerDensity;
 
 	player = {
 		x: playerX,
 		y: playerY,
-		radius: map.playerRadius,
-		density: map.playerDensity
+		radius: playerRadius,
+		density: playerDensity
 	};
 }
 
@@ -147,6 +155,16 @@ function getDensity(radius) {
 	}
 
 	return density;
+}
+
+function keyDown(e) {
+
+	if (e.keyCode == 78) {
+		restart();
+		newGame();
+	} else if (e.keyCode == 82) {
+		restart();
+	}
 }
 
 function mouseMove(e) {
@@ -211,17 +229,24 @@ function update(dt) {
 
 			if (Math.sqrt(Math.pow(p.y - player.y, 2) + Math.pow(p.x - player.x, 2)) < p.radius + player.radius) {
 				restart();
+				audios[AUDIO_LOSE].play();
 			}
 		}
 
 		if (Math.sqrt(Math.pow(goalPlanet.y - player.y, 2) + Math.pow(goalPlanet.x - player.x, 2)) < goalPlanet.radius + player.radius) {
 			restart();
+			audios[AUDIO_WIN].play();
 			level++;
-			loadLevel(level);
+
+			if (level >= maps.length - 1)
+				newGame();
+			else
+				loadLevel(level);
 		}
 
 		if (player.x > solarSystem.width || player.x <= 0 || player.y > solarSystem.height || player.y <= 0) {
 			restart();
+			audios[AUDIO_LOSE].play();
 		}
 
 	} else {
@@ -245,8 +270,10 @@ function update(dt) {
 			s.y = Math.sin(radians) * (p.radius + s.distance) + p.y;
 			s.angle += s.direction;
 
-			if (Math.sqrt(Math.pow(player.y - s.y, 2) + Math.pow(player.x - s.x, 2)) < player.radius + s.radius)
+			if (Math.sqrt(Math.pow(player.y - s.y, 2) + Math.pow(player.x - s.x, 2)) < player.radius + s.radius) {
 				restart();
+				audios[AUDIO_LOSE].play();
+			}
 		}
 	}
 }
@@ -254,18 +281,18 @@ function update(dt) {
 function draw() {
 
 	ctx.clearRect(0, 0, 800, 600);
-	
+
 	ctx.save();
 	ctx.beginPath();
 	ctx.arc(homePlanet.x, homePlanet.y, homePlanet.radius, 0, 2 * Math.PI);
-	ctx.fillStyle = '#000066';
+	ctx.fillStyle = '#0000dd';
 	ctx.fill();
 	ctx.restore();
 
 	ctx.save();
 	ctx.beginPath();
 	ctx.arc(goalPlanet.x, goalPlanet.y, goalPlanet.radius, 0, 2 * Math.PI);
-	ctx.fillStyle = '#006600';
+	ctx.fillStyle = '#00dd00';
 	ctx.fill();
 	ctx.font = '20px Arial';
 	ctx.strokeStyle = '#ffffff';
@@ -292,7 +319,7 @@ function draw() {
 		ctx.save();
 		ctx.beginPath();
 		ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
-		ctx.fillStyle = '#660000';
+		ctx.fillStyle = '#dd0000';
 		ctx.fill();
 		ctx.font = '20px Arial';
 		ctx.strokeStyle = '#ffffff';
@@ -320,7 +347,7 @@ function draw() {
 	ctx.save();
 	ctx.beginPath();
 	ctx.rect(730, 100, 40, -currentPowerRectHeight);
-	ctx.fillStyle = '#00cc00';
+	ctx.fillStyle = '#00dd00';
 	ctx.fill();
 	ctx.restore();
 
@@ -352,7 +379,7 @@ function run() {
 		previousTime = time;
 		time = new Date().getTime();
 
-		update((time - previousTime) / 100);
+		update(0.1);
 		draw();
 	}, 1000 / fps);
 }
@@ -374,6 +401,12 @@ getLevels.done(function(data) {
 	loadLevel(level);
 });
 
+//load the audios
+var str = ['lose', 'win'];
+for (var i = 0; i < str.length; i++) {
+	audios.push(new Audio('assets/sounds/'+ str[i] +'.mp3'));
+}
+
 solarSystem.addEventListener('mousemove', mouseMove);
 solarSystem.addEventListener('mouseup', launch);
 solarSystem.addEventListener('mousedown', function(e) {
@@ -381,8 +414,7 @@ solarSystem.addEventListener('mousedown', function(e) {
 		launching = true;
 });
 
-//this would start a random game
-//newGame();
+window.addEventListener('keydown', keyDown);
 
 //start the game loop
 run();

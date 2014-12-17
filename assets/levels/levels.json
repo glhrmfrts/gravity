@@ -293,7 +293,7 @@
 		"radius": 60,
 		"density": 4
 	},
-	"maxPower": 60,
+	"maxPower": 40,
 	"playerRadius": 10,
 	"playerDensity": 1,
 	"planets": [
@@ -374,9 +374,9 @@
 		"x": 740,
 		"y": 300,
 		"radius": 50,
-		"density": 3
+		"density": 4
 	},
-	"maxPower": 60,
+	"maxPower": 40,
 	"playerRadius": 8,
 	"playerDensity": 2,
 	"planets": [
@@ -461,6 +461,65 @@
 				{
 					"direction": 2,
 					"distance": 30,
+					"angle": 0,
+					"radius": 15,
+					"x": 0,
+					"y": 0
+				}
+			]
+		}
+	]
+},
+{
+	"homePlanet": {
+		"x": 60,
+		"y": 200,
+		"radius": 39,
+		"density": 1
+	},
+	"goalPlanet": {
+		"x": 60,
+		"y": 400,
+		"radius": 39,
+		"density": 1
+	},
+	"maxPower": 60,
+	"playerRadius": 10,
+	"playerDensity": 1,
+	"planets": [
+		{
+			"x": 60,
+			"y": 300,
+			"radius": 45,
+			"density": 2,
+			"satellites": [
+			]
+		},
+		{
+			"x": 180,
+			"y": 300,
+			"radius": 45,
+			"density": 2,
+			"satellites": [
+			]
+		},
+		{
+			"x": 300,
+			"y": 300,
+			"radius": 45,
+			"density": 2,
+			"satellites": [
+			]
+		},
+		{
+			"x": 500,
+			"y": 300,
+			"radius": 60,
+			"density": 5,
+			"satellites": [
+				{
+					"direction": -3,
+					"distance": 40,
 					"angle": 0,
 					"radius": 15,
 					"x": 0,

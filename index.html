@@ -3,28 +3,77 @@
 <head>
 	<meta charset="utf-8">
 	<title>Gravity Game</title>
+	<link href='http://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 	<style>
 		body {
+			font-family: 'VT323';
 			background-color: rgb(0, 0, 0);
+			color:#fff;
 		}
-		#game {
+		#game, #start {
 			max-width: 800px;
 			width:100%;
 			padding-top: 40px;
-			padding-bottom: 40px;
 			margin: 0 auto;
+		}
+		#game {
+			display:none;
+		}
+		#start {
+			border: 1px dotted #fff;
+			padding-left: 20px;
+			padding-right: 20px;
+			padding-bottom: 40px;
 		}
 		#solar_system {
 			background:white;
 			position:relative;
 		}
+		.title {
+			font-size:42px;
+			text-align:center;
+		}
+		.important {
+			font-weight:bold;
+			font-size: 20px;
+		}
+		#play {
+			font-size: 28px;
+		}
+		.b {
+			font-size: 10px;
+		}
 	</style>
 </head>
 <body>
+<div id="start">
+	<h1 class="title">Gravity Game</h1>
+	<p><strong class="important">How to play:</strong> The goal is to get to the green planet without crashing in the red ones or the satellites, use the gravity of the red planets to curve your way down (or up) to the green planet. </p>
+	<h2 class="controls">Controls</h2>
+	<ul class="keys">
+		<li>Hold the mouse down to increase your launch power and release it to launch.</li>
+		<li><strong class="important">N: </strong>Start a random map (random positions).</li>
+		<li><strong class="important">R: </strong>Restart your position.</li>
+	</ul>
+	<p>I'll be adding more levels eventually.</p>
+	<p>Thank you. <span class="b">Also please note I have no idea of what i'm doing.</span></p>
+
+	<button id="play">Start</button>
+	
+</div>
 <div id="game">
 	<canvas id="solar_system" width="800" height="600"></canvas>
 </div>
+<div id="c" style="margin: 0 auto; width:800px; text-align:center;">
+	<small>&copy; glhrmfrts - <a href="http://github.com/glhrmfrts/gravity">view source</small>
+</div>
 <script src="scripts/gravity_game.js"></script>
+<script>
+	$('#play').on('click', function() {
+		$('#start').hide();
+		$('#game').show();
+	});
+</script>
 </body>
 </html>
