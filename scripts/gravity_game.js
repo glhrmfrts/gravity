@@ -365,13 +365,6 @@ function draw() {
 		}
 	}
 
-	ctx.save();
-	ctx.beginPath();
-	ctx.arc(Math.cos(playerAngle) * player.radius + player.x, Math.sin(playerAngle) * player.radius + player.y, player.radius / 4, 0, 2 * Math.PI);
-	ctx.fillStyle = '#f3f3f3';
-	ctx.fill();
-	ctx.restore();
-
 	for (var i = 0; i < planets.length; i++) {
 		var p = planets[i];
 		var text = p.density;
