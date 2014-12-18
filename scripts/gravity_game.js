@@ -458,7 +458,6 @@ function run() {
 	}, 1000 / fps);
 }
 
-//util functions
 function intersects(ax, ay, bx, by, aw, bw) {
 
 	if (Math.sqrt(Math.pow(by - ay, 2) + Math.pow(bx - ax, 2)) < aw + bw)
