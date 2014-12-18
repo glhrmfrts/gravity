@@ -8,6 +8,7 @@ var solarSystem = document.getElementById('solar_system'),
 	planets = [],
 	totalPlanets = 0,
 	player = {},
+	trailCount = 20,
 	homePlanet = {},
 	goalPlanet = {},
 	radius = 0,
@@ -131,8 +132,16 @@ function createPlayer(random) {
 		x: playerX,
 		y: playerY,
 		radius: playerRadius,
-		density: playerDensity
+		density: playerDensity,
+		trail: []
 	};
+
+	var i = 0;
+	while (i < trailCount) {
+
+		player.trail.push({x: 0, y: 0, radius: 0});
+		i++;
+	}
 }
 
 function getDensity(radius) {
@@ -233,6 +242,19 @@ function update(dt) {
 		player.x += player.velocityX * dt;
 		player.y += player.velocityY * dt;
 
+		for (var i = 0; i < player.trail.length; i++) {
+
+			var at = player.trail[i], bt = player.trail[i-1];
+			player.trail[player.trail.length - 1].x = player.x;
+			player.trail[player.trail.length - 1].y = player.y;
+
+			if (i > 0) {
+				bt.x += (at.x - bt.x) / 2;
+				bt.y += (at.y - bt.y) / 2;
+				bt.radius = at.radius - (1 / (12 - player.radius));
+			}
+		}
+
 		for (var i = 0; i < planets.length; i++) {
 			var p = planets[i];
 
@@ -250,7 +272,7 @@ function update(dt) {
 
 			level++;
 
-			if (level == maps.length)
+			if (level >= maps.length)
 				newGame();
 			else
 				loadLevel(level);
@@ -269,6 +291,14 @@ function update(dt) {
 		angleText = playerAngle * 180 / Math.PI;
 		player.x = Math.cos(playerAngle) * homePlanet.radius + homePlanet.x;
 		player.y = Math.sin(playerAngle) * homePlanet.radius + homePlanet.y;
+
+		for (var i = 0; i < player.trail.length; i++) {
+
+			var t = player.trail[i];
+			t.x = player.x;
+			t.y = player.y;
+			t.radius = player.radius;
+		}
 	}
 
 	//update satellite's orbits
@@ -321,6 +351,20 @@ function draw() {
 	ctx.fill();
 	ctx.restore();
 
+	if (flying) {
+
+		for (var i = 0; i < player.trail.length; i++) {
+
+			var t = player.trail[i];
+			ctx.save();
+			ctx.beginPath();
+			ctx.arc(t.x, t.y, t.radius, 0, 2*Math.PI);
+			ctx.fillStyle = '#000000';
+			ctx.fill();
+			ctx.restore();
+		}
+	}
+
 	ctx.save();
 	ctx.beginPath();
 	ctx.arc(Math.cos(playerAngle) * player.radius + player.x, Math.sin(playerAngle) * player.radius + player.y, player.radius / 4, 0, 2 * Math.PI);
@@ -356,7 +400,7 @@ function draw() {
 
 		ctx.save();
 		ctx.beginPath();
-		ctx.drawImage(soundImg, 20, 540, soundImg.width, soundImg.height);
+		ctx.drawImage(soundImg, 20, 550, soundImg.width, soundImg.height);
 		ctx.restore();
 	}
 
@@ -391,7 +435,7 @@ function restart() {
 	currentPowerRectHeight = 0;
 
 	if (powerDirection < 0) powerDirection = -powerDirection;
-	maxPower = map.maxPower;
+	if (!random) maxPower = map.maxPower;
 }
 
 function run() {
@@ -439,8 +483,8 @@ for (var i = 0; i < str.length; i++) {
 
 var soundImg = new Image();
 soundImg.src = 'assets/img/sound.png';
-soundImg.width = 40;
-soundImg.height = 40;
+soundImg.width = 30;
+soundImg.height = 30;
 
 var _soundActivated = true;
 
@@ -450,7 +494,13 @@ solarSystem.addEventListener('mousedown', mouseDown);
 
 window.addEventListener('keydown', keyDown);
 
-//start the game loop
-run();
+document.getElementById('play')
+	.addEventListener('click', function(e) {
+		document.getElementById('start').style.display = 'none';
+		document.getElementById('game').style.display = 'block';
+
+		//start the game loop
+		run();
+	});
 
 
