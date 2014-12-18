@@ -165,6 +165,9 @@ function keyDown(e) {
 		newGame();
 	} else if (e.keyCode == 82) {
 		restart();
+	} else if (e.keyCode == 83) {
+		if (_soundActivated) _soundActivated = false;
+		else _soundActivated = true; 
 	}
 }
 
@@ -172,6 +175,11 @@ function mouseMove(e) {
 
 	mouseX = e.offsetX || e.layerX;
 	mouseY = e.offsetY || e.layerY;
+}
+
+function mouseDown(e) {
+	if (!flying)
+		launching = true;
 }
 
 //launches the player towards the mouse position
@@ -230,13 +238,16 @@ function update(dt) {
 
 			if (Math.sqrt(Math.pow(p.y - player.y, 2) + Math.pow(p.x - player.x, 2)) < p.radius + player.radius) {
 				restart();
-				audios[AUDIO_LOSE].play();
+				if (_soundActivated)
+					audios[AUDIO_LOSE].play();
 			}
 		}
 
 		if (Math.sqrt(Math.pow(goalPlanet.y - player.y, 2) + Math.pow(goalPlanet.x - player.x, 2)) < goalPlanet.radius + player.radius) {
 			restart();
-			audios[AUDIO_WIN].play();
+			if (_soundActivated)
+				audios[AUDIO_WIN].play();
+
 			level++;
 
 			if (level == maps.length)
@@ -247,7 +258,8 @@ function update(dt) {
 
 		if (player.x > solarSystem.width || player.x <= 0 || player.y > solarSystem.height || player.y <= 0) {
 			restart();
-			audios[AUDIO_LOSE].play();
+			if (_soundActivated)
+				audios[AUDIO_LOSE].play();
 		}
 
 	} else {
@@ -273,7 +285,9 @@ function update(dt) {
 
 			if (Math.sqrt(Math.pow(player.y - s.y, 2) + Math.pow(player.x - s.x, 2)) < player.radius + s.radius) {
 				restart();
-				audios[AUDIO_LOSE].play();
+
+				if (_soundActivated)
+					audios[AUDIO_LOSE].play();
 			}
 		}
 	}
@@ -297,7 +311,7 @@ function draw() {
 	ctx.fill();
 	ctx.font = '20px Arial';
 	ctx.strokeStyle = '#ffffff';
-	ctx.strokeText(''+ goalPlanet.density / 2, goalPlanet.x - 5, goalPlanet.y + 5);
+	ctx.strokeText(''+ goalPlanet.density, goalPlanet.x - 5, goalPlanet.y + 5);
 	ctx.restore();
 
 	ctx.save();
@@ -316,7 +330,7 @@ function draw() {
 
 	for (var i = 0; i < planets.length; i++) {
 		var p = planets[i];
-		var text = (p.density == 2) ? (p.density - 1.5) : (p.density - 2);
+		var text = p.density;
 		ctx.save();
 		ctx.beginPath();
 		ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
@@ -336,6 +350,14 @@ function draw() {
 			ctx.fill();
 			ctx.restore();
 		}
+	}
+
+	if (_soundActivated) {
+
+		ctx.save();
+		ctx.beginPath();
+		ctx.drawImage(soundImg, 20, 540, soundImg.width, soundImg.height);
+		ctx.restore();
 	}
 
 	ctx.save();
@@ -415,12 +437,16 @@ for (var i = 0; i < str.length; i++) {
 	audios.push(new Audio('assets/sounds/'+ str[i] +'.mp3'));
 }
 
+var soundImg = new Image();
+soundImg.src = 'assets/img/sound.png';
+soundImg.width = 40;
+soundImg.height = 40;
+
+var _soundActivated = true;
+
 solarSystem.addEventListener('mousemove', mouseMove);
 solarSystem.addEventListener('mouseup', launch);
-solarSystem.addEventListener('mousedown', function(e) {
-	if (!flying)
-		launching = true;
-});
+solarSystem.addEventListener('mousedown', mouseDown);
 
 window.addEventListener('keydown', keyDown);
 
