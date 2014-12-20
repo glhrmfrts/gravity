@@ -1,0 +1,138 @@
+<!doctype HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width user-scalable=no initial-scale=1.0">
+	<title>Gravity Game</title>
+	<link href='http://fonts.googleapis.com/css?family=VT323' rel='stylesheet' type='text/css'>
+	<script src="https://cdn.firebase.com/js/client/2.0.6/firebase.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<style>
+		body {
+			font-family: 'VT323';
+			background-color: rgb(0, 0, 0);
+			color:#fff;
+		}
+		#game, #start {
+			max-width: 800px;
+			width:100%;
+			padding-top: 40px;
+			margin: 0 auto;
+		}
+		#game {
+			display:none;
+		}
+		#start {
+			border: 1px dotted #fff;
+			padding-left: 20px;
+			padding-right: 20px;
+			padding-bottom: 40px;
+		}
+		#solar_system_preview {
+			background:white;
+			position:relative;
+			margin-top: 20px;
+		}
+		.title {
+			font-size:42px;
+			text-align:center;
+		}
+		.important {
+			font-weight:bold;
+			font-size: 20px;
+		}
+		#play {
+			font-size: 28px;
+		}
+		.b {
+			font-size: 10px;
+		}
+		.add-satellite {
+			margin-left: 10px;
+		}
+		.input {
+			background:transparent;
+			border:none;
+			border-bottom: 1px dotted #fff;
+			color:#fff;
+		}
+		table {
+		}
+		table tr {
+			padding: 10px;
+		}
+		table tr td {
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+<div id="start">
+	<h1 class="title">Gravity Game Level Editor</h1>
+	<div class="home-planet">
+		<a href="#preview" style="float:right; padding: 8px 12px; background-color:#fff;">PREVIEW</a>
+		<h2>Home Planet</h2>
+		<table style="width:100%;">
+			<tr>
+				<td><strong class="important">X</strong></td>
+				<td><strong class="important">Y</strong></td>
+				<td><strong class="important">Radius</strong></td>
+				<td><strong class="important">Density</strong></td>
+			</tr>
+			<tr>
+				<td><input type="text" class="input" onblur="editor.commit('homePlanet', 'x', this)"></td>
+				<td><input type="text" class="input" onblur="editor.commit('homePlanet', 'y', this)"></td>
+				<td><input type="text" class="input" onblur="editor.commit('homePlanet', 'radius', this)"></td>
+				<td><input type="text" class="input" onblur="editor.commit('homePlanet', 'density', this)"></td>
+			</tr>
+		</table>
+	</div>
+	<div id="goal-planet">
+		<h2>Goal Planet</h2>
+		<table style="width:100%;">
+			<tr>
+				<td><strong class="important">X</strong></td>
+				<td><strong class="important">Y</strong></td>
+				<td><strong class="important">Radius</strong></td>
+				<td><strong class="important">Density</strong></td>
+			</tr>
+			<tr>
+				<td><input type="text" class="input" onblur="editor.commit('goalPlanet', 'x', this)"></td>
+				<td><input type="text" class="input" onblur="editor.commit('goalPlanet', 'y', this)"></td>
+				<td><input type="text" class="input" onblur="editor.commit('goalPlanet', 'radius', this)"></td>
+				<td><input type="text" class="input" onblur="editor.commit('goalPlanet', 'density', this)"></td>
+			</tr>
+		</table>
+	</div>
+	<div id="planets">
+		<h2>Planets</h2>
+		<table style="width:100%;" id="planets-table">
+		</table>
+		<button style="margin: 10px;" onclick="editor.addPlanet()">+ Add</button>
+	</div>
+	<div id="settings">
+		<h2>Settings</h2>
+		<table style="width:100%;">
+			<tr>
+				<td><strong class="important">Max Velocity</strong></td>
+				<td><strong class="important">Player Radius</strong></td>
+				<td><strong class="important">Player Density</strong></td>
+			</tr>
+			<tr>
+				<td><input type="text" class="input" onblur="editor.commitSimple('maxPower', this)"></td>
+				<td><input type="text" class="input" onblur="editor.commitSimple('playerRadius', this)"></td>
+				<td><input type="text" class="input" onblur="editor.commitSimple('playerDensity', this)"></td>
+			</tr>
+		</table>
+	</div>
+	<div id="preview">
+		<h2>Preview</h2>
+		<canvas id="solar_system_preview" width="800" height="600">
+	</div>
+	<div id="save" style="padding-top: 20px;">
+		<button onclick="save()">Save</button>
+	</div>
+</div>
+<script src="/gravity/scripts/editor.js"></script>
+</body>
+</html>

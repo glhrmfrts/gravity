@@ -141,6 +141,7 @@ function createPlayer(random) {
 
 		player.trail.push({x: 0, y: 0, radius: 0});
 		i++;
+		console.log(player.trail.length);
 	}
 }
 
@@ -184,6 +185,13 @@ function mouseMove(e) {
 
 	mouseX = e.offsetX || e.layerX;
 	mouseY = e.offsetY || e.layerY;
+}
+
+function touchMove(e) {
+
+	var pointer = e.changedTouches[0];
+	mouseX = pointer.offsetX || pointer.layerX;
+	mouseY = pointer.offsetY || pointer.layerY;
 }
 
 function mouseDown(e) {
@@ -299,25 +307,28 @@ function update(dt) {
 			t.y = player.y;
 			t.radius = player.radius;
 		}
+		
 	}
 
 	//update satellite's orbits
 	for (var i = 0; i < planets.length; i++) {
 		var p = planets[i];
 
-		for (var j = 0; j < p.satellites.length; j++) {
-			s = p.satellites[j];
+		if (p.satellites) {
+			for (var j = 0; j < p.satellites.length; j++) {
+				s = p.satellites[j];
 
-			var radians = s.angle * (Math.PI / 180);
-			s.x = Math.cos(radians) * (p.radius + s.distance) + p.x;
-			s.y = Math.sin(radians) * (p.radius + s.distance) + p.y;
-			s.angle += s.direction;
+				var radians = s.angle * (Math.PI / 180);
+				s.x = Math.cos(radians) * (p.radius + s.distance) + p.x;
+				s.y = Math.sin(radians) * (p.radius + s.distance) + p.y;
+				s.angle += s.direction;
 
-			if (Math.sqrt(Math.pow(player.y - s.y, 2) + Math.pow(player.x - s.x, 2)) < player.radius + s.radius) {
-				restart();
+				if (Math.sqrt(Math.pow(player.y - s.y, 2) + Math.pow(player.x - s.x, 2)) < player.radius + s.radius) {
+					restart();
 
-				if (_soundActivated)
-					audios[AUDIO_LOSE].play();
+					if (_soundActivated)
+						audios[AUDIO_LOSE].play();
+				}
 			}
 		}
 	}
@@ -378,14 +389,16 @@ function draw() {
 		ctx.strokeText(''+ text, p.x - 5, p.y + 5);
 		ctx.restore();
 
-		for (var j = 0; j < p.satellites.length; j++) {
-			var s = p.satellites[j];
-			ctx.save();
-			ctx.beginPath();
-			ctx.arc(s.x, s.y, s.radius, 0, 2 * Math.PI);
-			ctx.fillStyle = '#000000';
-			ctx.fill();
-			ctx.restore();
+		if (p.satellites) {
+			for (var j = 0; j < p.satellites.length; j++) {
+				var s = p.satellites[j];
+				ctx.save();
+				ctx.beginPath();
+				ctx.arc(s.x, s.y, s.radius, 0, 2 * Math.PI);
+				ctx.fillStyle = '#000000';
+				ctx.fill();
+				ctx.restore();
+			}
 		}
 	}
 
@@ -460,10 +473,11 @@ function intersects(ax, ay, bx, by, aw, bw) {
 }
 
 //load the maps
-var level = 0,
-	getLevels = $.getJSON("assets/levels/levels.json");
-getLevels.done(function(data) {
-	loadMaps(data);
+var level = 0;
+var fb = new Firebase('https://gravitygame.firebaseio.com');
+fb.child('levels').on('value', function(snapshot) {
+
+	loadMaps(snapshot.val());
 	loadLevel(level);
 });
 
@@ -483,6 +497,9 @@ var _soundActivated = true;
 solarSystem.addEventListener('mousemove', mouseMove);
 solarSystem.addEventListener('mouseup', launch);
 solarSystem.addEventListener('mousedown', mouseDown);
+solarSystem.addEventListener('touchstart', mouseDown);
+solarSystem.addEventListener('touchmove', touchMove);
+solarSystem.addEventListener('touchend', launch);
 
 window.addEventListener('keydown', keyDown);
 
